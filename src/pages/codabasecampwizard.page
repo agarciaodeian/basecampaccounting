@@ -1,0 +1,164 @@
+<!-- 
+/************************************************************************
+ * Copyright © 2009 CODA.  All rights reserved.
+ *
+ * You have a royalty-free right to use, modify, reproduce and distribute
+ * the Sample Application Files (and/or any modified version) in any way
+ * you find useful for your own internal business purposes, provided that
+ * you agree that CODA has no warranty,obligations or liability for any
+ * Sample Application Files.
+ *
+ ************************************************************************/
+-->
+<apex:page controller="CODABasecampWizardController">
+		<apex:sectionHeader title="Basecamp Wizard" subtitle="Create Invoices from Time Entries"/>
+		<apex:messages />
+		<apex:form >
+			<!--  Step: Login -->
+			<apex:pageBlock title="Step 1 of 5: Login" mode="detail" rendered="{!Step = 0}">
+				<apex:pageBlockButtons >
+					<apex:commandButton action="{!Back}" value="Back" disabled="true"/>			
+					<apex:commandButton action="{!Next}" value="Next"/>
+				</apex:pageBlockButtons>
+				<apex:pageBlockSection >
+					<apex:panelGrid columns="2" border="0">		
+						<apex:outputLabel style="font-weight: bold;" value="Site"/>
+						<apex:inputText value="{!Connection.BaseURL}" size="32"/>
+						<apex:outputLabel style="font-weight: bold;" value="User"/>
+						<apex:inputText value="{!Connection.UserName}"/>
+						<apex:outputLabel style="font-weight: bold;" value="Password"/>
+						<apex:inputSecret value="{!Connection.Password}" redisplay="true"/>
+					</apex:panelGrid>
+				</apex:pageBlockSection>
+			</apex:pageBlock>
+			<!--  Step: Select Project -->
+			<apex:pageBlock title="Step 2 of 5: Select Project" mode="detail" rendered="{!Step = 1}">
+				<apex:pageBlockButtons >
+					<apex:commandButton action="{!Back}" value="Back"/>			
+					<apex:commandButton action="{!Next}" value="Next"/>
+				</apex:pageBlockButtons>
+				<apex:pageBlockSection >
+					<apex:panelGrid columns="2" border="0">		
+						<apex:outputLabel style="font-weight: bold;" value="Projects"/>
+						<apex:selectList value="{!SelectedProjectID}" size="0">
+							<apex:selectOptions value="{!ProjectList}"/>
+						</apex:selectList>					
+						<apex:outputLabel style="white-space:nowrap; font-weight: bold;"  value="Map to"/>
+						<apex:selectList value="{!SelectedDimensionProject}" size="0">
+							<apex:selectOptions value="{!DimensionList}"/>
+						</apex:selectList>					
+					</apex:panelGrid>
+				</apex:pageBlockSection>
+			</apex:pageBlock>
+			<!--  Step: Select Todo Lists -->
+			<apex:pageBlock title="Step 3 of 5: Select Todo Lists" mode="detail" rendered="{!Step = 2}">
+				<apex:pageBlockButtons >
+					<apex:commandButton action="{!Back}" value="Back"/>			
+					<apex:commandButton action="{!Next}" value="Next"/>
+				</apex:pageBlockButtons>
+				<apex:pageBlockSection >
+					<apex:panelGrid columns="2" border="0" width="100%">		
+						<apex:outputLabel style="white-space:nowrap; font-weight: bold;" value="Todo Lists"/>
+						<apex:dataTable value="{!TodoLists}" var="todoList" cellspacing="8">
+							<apex:column >
+						        <apex:facet name="header">Select</apex:facet>
+								<apex:inputCheckbox value="{!todoList.Selected}"/>
+							</apex:column>						
+							<apex:column >
+						        <apex:facet name="header">Name</apex:facet>
+								<apex:outputText style="white-space:nowrap;"  value="{!todoList.TodoList.Name}"/>
+							</apex:column>
+							<apex:column >
+								<apex:facet name="header">Description</apex:facet>
+								<apex:outputText style="white-space:nowrap;"  value="{!todoList.TodoList.Description}"/>
+							</apex:column>
+						</apex:dataTable>					
+						<apex:outputLabel style="white-space:nowrap; font-weight: bold;" value="Map to"/>
+						<apex:selectList value="{!SelectedDimensionTodoList}" size="0">
+							<apex:selectOptions value="{!DimensionList}"/>
+						</apex:selectList>					
+					</apex:panelGrid>
+				</apex:pageBlockSection>
+			</apex:pageBlock>			
+			<!--  Step: Select Time Entries -->
+			<apex:pageBlock title="Step 4 of 5: Select Time Entries" mode="detail" rendered="{!Step = 3}">
+				<apex:pageBlockButtons >
+					<apex:commandButton action="{!Back}" value="Back"/>			
+					<apex:commandButton action="{!Next}" value="Next"/>
+				</apex:pageBlockButtons>
+				<apex:pageBlockSection >
+					<apex:panelGrid columns="2" border="0" width="100%">		
+						<apex:outputLabel style="white-space:nowrap; font-weight: bold;" value="Time Entries"/>
+						<apex:dataTable value="{!TimeEntires}" var="timeEntry" cellspacing="8">
+							<apex:column >
+						        <apex:facet name="header">Select</apex:facet>
+								<apex:inputCheckbox value="{!timeEntry.Selected}"/>
+							</apex:column>						
+							<apex:column >
+						        <apex:facet name="header">Todo List</apex:facet>
+								<apex:outputText style="white-space:nowrap;" value="{!timeEntry.TodoList.Name}"/>
+							</apex:column>													
+							<apex:column >
+						        <apex:facet name="header">Person</apex:facet>
+								<apex:outputText style="white-space:nowrap;" value="{!timeEntry.Person.FirstName} {!timeEntry.Person.LastName}"/>
+							</apex:column>							
+							<apex:column >
+						        <apex:facet name="header">Description</apex:facet>
+								<apex:outputText style="white-space:nowrap;"  value="{!timeEntry.TimeEntry.Description}"/>
+							</apex:column>
+							<apex:column style="text-align:right !important;">
+								<apex:facet name="header">Hours</apex:facet>
+								<apex:outputText style="white-space:nowrap;"  value="{!timeEntry.TimeEntry.Hours}"/>
+							</apex:column>
+						</apex:dataTable>					
+						<apex:outputLabel style="white-space:nowrap; font-weight: bold;" value="Map Person to"/>
+						<apex:selectList value="{!SelectedDimensionPerson}" size="0">
+							<apex:selectOptions value="{!DimensionList}"/>
+						</apex:selectList>					
+					</apex:panelGrid>
+				</apex:pageBlockSection>
+			</apex:pageBlock>						
+			<!--  Step: Select Account and Product to charge time against -->
+			<apex:pageBlock title="Step 5 of 5: Create Invoice" mode="detail" rendered="{!Step = 4}">
+				<apex:pageBlockButtons >
+					<apex:commandButton action="{!Back}" value="Back"/>			
+					<apex:commandButton action="{!Next}" value="Finish"/>
+				</apex:pageBlockButtons>
+				<apex:pageBlockSection >
+					<apex:panelGrid columns="2" border="0" width="100%">							
+						<apex:outputLabel style="white-space:nowrap; font-weight: bold;" value="Currency"/>
+						<apex:inputField value="{!Lookup.Currency__c}"/>					
+						<apex:outputLabel style="white-space:nowrap; font-weight: bold;" value="Account"/>
+						<apex:inputField value="{!Lookup.Account__c}"/>
+						<apex:outputLabel style="white-space:nowrap; font-weight: bold;" value="Product"/>					
+						<apex:inputField value="{!Lookup.Product__c}"/>
+						<apex:outputLabel style="white-space:nowrap; font-weight: bold;" value="Period"/>					
+						<apex:inputField value="{!Lookup.Period__c}"/>
+						<apex:outputLabel style="white-space:nowrap; font-weight: bold;" value="Invoice Lines"/>
+						<apex:dataTable value="{!ReviewInvoiceLineItems}" var="reviewInvoiceLineItem" cellspacing="8">
+							<apex:column >
+						        <apex:facet name="header">Dimension {!SelectedDimensionProject} (Project)</apex:facet>
+								<apex:outputText style="white-space:nowrap;" value="{!SelectedProject.Name}"/>
+							</apex:column>																			
+							<apex:column >
+						        <apex:facet name="header">Dimension {!SelectedDimensionTodoList} (Todo List)</apex:facet>
+								<apex:outputText style="white-space:nowrap;" value="{!reviewInvoiceLineItem.TodoList.Name}"/>
+							</apex:column>													
+							<apex:column >
+						        <apex:facet name="header">Dimension {!SelectedDimensionPerson} (Person)</apex:facet>
+								<apex:outputText style="white-space:nowrap;" value="{!reviewInvoiceLineItem.Person.FirstName} {!reviewInvoiceLineItem.Person.LastName}"/>
+							</apex:column>							
+							<apex:column >
+						        <apex:facet name="header">Description</apex:facet>
+								<apex:outputText style="white-space:nowrap;"  value="{!reviewInvoiceLineItem.TimeEntry.Description}"/>
+							</apex:column>
+							<apex:column style="text-align:right !important;">
+								<apex:facet name="header">Quantity</apex:facet>
+								<apex:outputText style="white-space:nowrap;"  value="{!reviewInvoiceLineItem.TimeEntry.Hours}"/>
+							</apex:column>
+						</apex:dataTable>					
+					</apex:panelGrid>
+				</apex:pageBlockSection>
+			</apex:pageBlock>						
+		</apex:form>
+</apex:page>
