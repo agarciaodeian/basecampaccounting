@@ -1,5 +1,3 @@
-Readme   
-
 Make sure you add https://coda2go.basecamphq.com to your orgs Remote Site settings.
 
 Click Setup, then Administration Setup, then Security Controls. 
