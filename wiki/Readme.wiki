@@ -6,4 +6,4 @@ If you have a CODA 2go trial org, you can install this sample easily via AppExch
 
 https://login.salesforce.com/?startURL=%2Fpackaging%2FinstallPackage.apexp%3Fp0%3D04t80000000jCX0 
 
-Note: The code in this package may not be as recent as that in the SVN repository. 
+*Note:* The code in this package may not be as recent as that in the SVN repository. 
