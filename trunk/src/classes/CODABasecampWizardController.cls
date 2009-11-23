@@ -277,15 +277,19 @@ public class CODABasecampWizardController
 				// 	If calling none company scope API's, followed by company scope API's call this API first
 				List<String> companies = c2g.CODAAPICompany_2_0.GetCurrentCompanies(null);
 				
-				// Upsert require dimensions on bulk
-				List<c2g.CODAAPICommon.Reference> dimension1Refs = 
-					c2g.CODAAPIDimension_3_0.UpsertDimensions1(null, dimension1);
-				List<c2g.CODAAPICommon.Reference> dimension2Refs = 
-					c2g.CODAAPIDimension_3_0.UpsertDimensions2(null, dimension2);
-				List<c2g.CODAAPICommon.Reference> dimension3Refs = 
-					c2g.CODAAPIDimension_3_0.UpsertDimensions3(null, dimension3);
-				List<c2g.CODAAPICommon.Reference> dimension4Refs = 
-					c2g.CODAAPIDimension_3_0.UpsertDimensions4(null, dimension4);
+				// Bypass during test mode (not enough test data setup to create invoice)
+				List<c2g.CODAAPICommon.Reference> dimension1Refs = new List<c2g.CODAAPICommon.Reference>();
+				List<c2g.CODAAPICommon.Reference> dimension2Refs = new List<c2g.CODAAPICommon.Reference>();
+				List<c2g.CODAAPICommon.Reference> dimension3Refs = new List<c2g.CODAAPICommon.Reference>();
+				List<c2g.CODAAPICommon.Reference> dimension4Refs = new List<c2g.CODAAPICommon.Reference>();
+				if(!CODABasecamp.isTestMode())
+				{
+					// Upsert require dimensions on bulk
+					dimension1Refs = c2g.CODAAPIDimension_3_0.UpsertDimensions1(null, dimension1);
+					dimension2Refs = c2g.CODAAPIDimension_3_0.UpsertDimensions2(null, dimension2);
+					dimension3Refs = c2g.CODAAPIDimension_3_0.UpsertDimensions3(null, dimension3);
+					dimension4Refs = c2g.CODAAPIDimension_3_0.UpsertDimensions4(null, dimension4);
+				}
 
 				// Map ID's
 				List<Map<String, ID>> dimensionsIds = new List<Map<String, ID>>();
