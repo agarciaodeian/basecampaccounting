@@ -3,7 +3,7 @@
     <apiVersion>16.0</apiVersion>
     <label>codabasecampwizard</label>
     <packageVersions>
-        <majorNumber>1</majorNumber>
+        <majorNumber>3</majorNumber>
         <minorNumber>0</minorNumber>
         <namespace>c2g</namespace>
     </packageVersions>

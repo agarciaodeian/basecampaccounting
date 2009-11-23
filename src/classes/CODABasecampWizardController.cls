@@ -66,8 +66,8 @@ public class CODABasecampWizardController
 	
 	public PageReference Next()
 	{
-		try
-		{
+		//try
+		//{
 			// Login
 			if (Step == 0)
 			{
@@ -218,10 +218,10 @@ public class CODABasecampWizardController
 				}
 				
 				// Prepare required dimensions for upsert
-				List<c2g__codaDimension1__c> dimension1 = new List<c2g__codaDimension1__c>();
-				List<c2g__codaDimension2__c> dimension2 = new List<c2g__codaDimension2__c>();
-				List<c2g__codaDimension3__c> dimension3 = new List<c2g__codaDimension3__c>();
-				List<c2g__codaDimension4__c> dimension4 = new List<c2g__codaDimension4__c>();				 
+				List<c2g.CODAAPIDimension_3_0.Dimension> dimension1 = new List<c2g.CODAAPIDimension_3_0.Dimension>();
+				List<c2g.CODAAPIDimension_3_0.Dimension> dimension2 = new List<c2g.CODAAPIDimension_3_0.Dimension>();
+				List<c2g.CODAAPIDimension_3_0.Dimension> dimension3 = new List<c2g.CODAAPIDimension_3_0.Dimension>();
+				List<c2g.CODAAPIDimension_3_0.Dimension> dimension4 = new List<c2g.CODAAPIDimension_3_0.Dimension>();				 
 				Integer dimensionIdx = 1;
 				for(Map<String, DimensionInfo> dimensionNames : dimensions)
 				{  
@@ -232,51 +232,60 @@ public class CODABasecampWizardController
 						if(dimensionIdx == 1)
 						{	
 							// Create a Dimension 1 record
-							c2g__codaDimension1__c dimension = new c2g__codaDimension1__c();
+							c2g.CODAAPIDimension_3_0.Dimension dimension = new c2g.CODAAPIDimension_3_0.Dimension();
 							dimension.Name = dimensionName;
 							dimension.CurrencyIsoCode = currencyIso;
-							dimension.c2g__ReportingCode__c = dimensionId;
-							dimension.c2g__ExternalId__c = dimensionId; 
+							dimension.ReportingCode = dimensionId;
+							dimension.ExternalId = dimensionId; 
 							dimension1.add(dimension);
 						}
 						else if(dimensionIdx == 2)
 						{ 
 							// Create a Dimension 2 record
-							c2g__codaDimension2__c dimension = new c2g__codaDimension2__c();
+							c2g.CODAAPIDimension_3_0.Dimension dimension = new c2g.CODAAPIDimension_3_0.Dimension();
 							dimension.Name = dimensionName;
 							dimension.CurrencyIsoCode = currencyIso; 
-							dimension.c2g__ReportingCode__c = dimensionId; 
-							dimension.c2g__ExternalId__c = dimensionId; 
+							dimension.ReportingCode = dimensionId; 
+							dimension.ExternalId = dimensionId; 
 							dimension2.add(dimension);
 						}
 						else if(dimensionIdx == 3)
 						{ 
 							// Create a Dimension 3 record
-							c2g__codaDimension3__c dimension = new c2g__codaDimension3__c();
+							c2g.CODAAPIDimension_3_0.Dimension dimension = new c2g.CODAAPIDimension_3_0.Dimension();
 							dimension.Name = dimensionName;
 							dimension.CurrencyIsoCode = currencyIso; 
-							dimension.c2g__ReportingCode__c = dimensionId; 
-							dimension.c2g__ExternalId__c = dimensionId; 
+							dimension.ReportingCode = dimensionId; 
+							dimension.ExternalId = dimensionId; 
 							dimension3.add(dimension);
 						}
 						else if(dimensionIdx == 4)
 						{ 
 							// Create a Dimension 4 record
-							c2g__codaDimension4__c dimension = new c2g__codaDimension4__c();
+							c2g.CODAAPIDimension_3_0.Dimension dimension = new c2g.CODAAPIDimension_3_0.Dimension();
 							dimension.Name = dimensionName;
 							dimension.CurrencyIsoCode = currencyIso; 
-							dimension.c2g__ReportingCode__c = dimensionId; 
-							dimension.c2g__ExternalId__c = dimensionId; 
+							dimension.ReportingCode = dimensionId; 
+							dimension.ExternalId = dimensionId; 
 							dimension4.add(dimension);
 						}
 					}
 					dimensionIdx++;
 				}
+
+				// IMPORTANT NOTE: Known issue with mixed scope API calls
+				// 	If calling none company scope API's, followed by company scope API's call this API first
+				List<String> companies = c2g.CODAAPICompany_2_0.GetCurrentCompanies(null);
+				
 				// Upsert require dimensions on bulk
-				upsert dimension1 c2g__ExternalId__c;
-				upsert dimension2 c2g__ExternalId__c;
-				upsert dimension3 c2g__ExternalId__c;
-				upsert dimension4 c2g__ExternalId__c;
+				List<c2g.CODAAPICommon.Reference> dimension1Refs = 
+					c2g.CODAAPIDimension_3_0.UpsertDimensions1(null, dimension1);
+				List<c2g.CODAAPICommon.Reference> dimension2Refs = 
+					c2g.CODAAPIDimension_3_0.UpsertDimensions2(null, dimension2);
+				List<c2g.CODAAPICommon.Reference> dimension3Refs = 
+					c2g.CODAAPIDimension_3_0.UpsertDimensions3(null, dimension3);
+				List<c2g.CODAAPICommon.Reference> dimension4Refs = 
+					c2g.CODAAPIDimension_3_0.UpsertDimensions4(null, dimension4);
 
 				// Map ID's
 				List<Map<String, ID>> dimensionsIds = new List<Map<String, ID>>();
@@ -284,24 +293,24 @@ public class CODABasecampWizardController
 				dimensionsIds.add(new Map<String, ID>());
 				dimensionsIds.add(new Map<String, ID>());
 				dimensionsIds.add(new Map<String, ID>());
-				for(c2g__codaDimension1__c dimension : dimension1)
+				for(c2g.CODAAPICommon.Reference dimension : dimension1Refs)
 					dimensionsIds[0].put(dimension.Name, dimension.Id);
-				for(c2g__codaDimension2__c dimension : dimension2)
+				for(c2g.CODAAPICommon.Reference dimension : dimension2Refs)
 					dimensionsIds[1].put(dimension.Name, dimension.Id);
-				for(c2g__codaDimension3__c dimension : dimension3)
+				for(c2g.CODAAPICommon.Reference dimension : dimension3Refs)
 					dimensionsIds[2].put(dimension.Name, dimension.Id);
-				for(c2g__codaDimension4__c dimension : dimension4)
+				for(c2g.CODAAPICommon.Reference dimension : dimension4Refs)
 					dimensionsIds[3].put(dimension.Name, dimension.Id);
 				
 				// Create the Invoice
-				c2g.CODAAPIInvoiceTypes_2_0.Invoice invoice = new c2g.CODAAPIInvoiceTypes_2_0.Invoice();
+				c2g.CODAAPIInvoiceTypes_3_0.Invoice invoice = new c2g.CODAAPIInvoiceTypes_3_0.Invoice();
 				invoice.Account = new c2g.CODAAPICommon.Reference();
 				invoice.Account.Id = Lookup.Account__c;
 				invoice.InvoiceCurrency = new c2g.CODAAPICommon.Reference();
 				invoice.InvoiceCurrency.Id = Lookup.Currency__c;
-				invoice.LineItems = new c2g.CODAAPIInvoiceLineItemTypes_2_0.InvoiceLineItems();
-				invoice.LineItems.LineItemList = new List<c2g.CODAAPIInvoiceLineItemTypes_2_0.InvoiceLineItem>();
-				invoice.InvoiceStatus = c2g.CODAAPIInvoiceTypes_2_0.enumInvoiceStatus.InProgress;
+				invoice.LineItems = new c2g.CODAAPIInvoiceLineItemTypes_3_0.InvoiceLineItems();
+				invoice.LineItems.LineItemList = new List<c2g.CODAAPIInvoiceLineItemTypes_3_0.InvoiceLineItem>();
+				invoice.InvoiceStatus = c2g.CODAAPIInvoiceTypes_3_0.enumInvoiceStatus.InProgress;
 				invoice.DueDate = System.now().addMonths(6).date();
 				invoice.InvoiceDate = System.now().date();
 				invoice.Period = new c2g.CODAAPICommon.Reference();
@@ -314,7 +323,7 @@ public class CODABasecampWizardController
 				for(ReviewInvoiceLineItem reviewInvoiceLineItem : ReviewInvoiceLineItems)
 				{
 					// Create Invoice Line Item
-					c2g.CODAAPIInvoiceLineItemTypes_2_0.InvoiceLineItem invoiceLineItem = new c2g.CODAAPIInvoiceLineItemTypes_2_0.InvoiceLineItem(); 
+					c2g.CODAAPIInvoiceLineItemTypes_3_0.InvoiceLineItem invoiceLineItem = new c2g.CODAAPIInvoiceLineItemTypes_3_0.InvoiceLineItem(); 
 					// Resolve ID's for Dimensions
 					String projectName = SelectedProject.Name;
 					String todoListName = reviewInvoiceLineItem.TodoList.Name;
@@ -357,7 +366,7 @@ public class CODABasecampWizardController
 				// Bypass during test mode (not enough test data setup to create invoice)
 				if(!CODABasecamp.isTestMode())
 				{
-					c2g.CODAAPICommon.Reference invoiceRef = c2g.CODAAPISalesInvoice_2_0.createInvoice(null, invoice); 			 				
+					c2g.CODAAPICommon.Reference invoiceRef = c2g.CODAAPISalesInvoice_3_0.createInvoice(null, invoice); 			 				
 					// Redirect to Edit Invoice page
 					String url = Page.c2g__codaInvoiceEdit.getUrl() + '?id=' + invoiceRef.Id;
 					PageReference pageRef = new PageReference(url);
@@ -371,11 +380,11 @@ public class CODABasecampWizardController
 			
 			// Setup the available dimensions to map
 			setupDimensionList();
-		}
-		catch (Exception e)
-		{
-			ApexPages.addMessages(e);
-		}
+		//}
+		//catch (Exception e)
+		//{
+			//ApexPages.addMessages(e);
+		//}
 		return null;
 	}
 	
@@ -467,5 +476,11 @@ public class CODABasecampWizardController
 	{
 		public String Name;
 		public String Id;	
-	}	
+	}
+	
+	public class StopException extends Exception
+	{
+		
+	}
+		
 }
