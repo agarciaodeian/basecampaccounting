@@ -1,3 +1,5 @@
+NOTE: The basecamp URL used bellow no longer exists. To use this sample you must modify it, to use your own basecamp account or a trial one.
+
 Make sure you add https://coda2go.basecamphq.com to your orgs Remote Site settings.
 
 Click Setup, then Administration Setup, then Security Controls. 
