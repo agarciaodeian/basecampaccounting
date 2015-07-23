@@ -2,52 +2,52 @@
  * Copyright (c) 2009, FinancialForce.com, inc
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification, 
+ * Redistribution and use in source and binary forms, with or without modification,
  *   are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
+ * - Redistributions of source code must retain the above copyright notice,
  *      this list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice, 
- *      this list of conditions and the following disclaimer in the documentation 
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *      this list of conditions and the following disclaimer in the documentation
  *      and/or other materials provided with the distribution.
- * - Neither the name of the FinancialForce.com, inc nor the names of its contributors 
- *      may be used to endorse or promote products derived from this software without 
+ * - Neither the name of the FinancialForce.com, inc nor the names of its contributors
+ *      may be used to endorse or promote products derived from this software without
  *      specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL 
- *  THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+ *  THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  *  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  *  OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  *  OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
- 
+
 /************************************************************************
  * CODABasecampWizardController
  *
  * Demo of CODABasecamp API class that retrieves time entries and produces
  * a CODA 2go Invoice from them
  ************************************************************************/
-public class CODABasecampWizardController 
+public class CODABasecampWizardController
 {
 	// View state and properties bound to page elements
-	public Integer Step { get; set; }		
-	public String SelectedProjectID { get; set; }	
-	public String SelectedDimensionProject { get; set; }	
-	public String SelectedDimensionTodoList { get; set; }	
-	public String SelectedDimensionPerson { get; set; }	
-	public CODABasecamp.Connection Connection { get; set; }	
-	public CODABasecamp.ProjectEntry SelectedProject { get; set; }	
-	public List<CODABasecamp.ProjectEntry> Projects { get; set; }	
+	public Integer Step { get; set; }
+	public String SelectedProjectID { get; set; }
+	public String SelectedDimensionProject { get; set; }
+	public String SelectedDimensionTodoList { get; set; }
+	public String SelectedDimensionPerson { get; set; }
+	public CODABasecamp.Connection Connection { get; set; }
+	public CODABasecamp.ProjectEntry SelectedProject { get; set; }
+	public List<CODABasecamp.ProjectEntry> Projects { get; set; }
 	public List<SelectTodoList> TodoLists { get; set; }
 	public List<SelectTimeEntry> TimeEntires { get; set; }
 	public List<SelectOption> DimensionList { get; set; }
 	public List<ReviewInvoiceLineItem> ReviewInvoiceLineItems { get; set; }
-	public Lookup__c Lookup { get; set; }
+	public c2g__codaLookup__c Lookup { get; set; }
 	private Map<String, CODABasecamp.Person> m_peopleMap;
-	
+
 	public CODABasecampWizardController()
 	{
 		// Defult connection details
@@ -56,14 +56,14 @@ public class CODABasecampWizardController
 		Connection.Password = 'password';
 		Connection.BaseURL = 'https://domain.basecamphq.com';
 		connection.Debug = true;
-			
+
 		// Set properties bound to page
 		Step = 0;
-		
+
 		// Initialise view state
 		m_peopleMap = new Map<String, CODABasecamp.Person>();
 	}
-	
+
 	public PageReference Next()
 	{
 		//try
@@ -75,7 +75,7 @@ public class CODABasecampWizardController
 				Projects = CODABasecamp.getProjects(Connection);
 				if(Projects.Size() > 0)
 					SelectedProjectID = Projects[0].ID;
-					
+
 				// Default to project called 'Product Discussion Forum' for demo purposes
 				for(CODABasecamp.ProjectEntry project : Projects)
 					if(project.Name == 'Hogan Repairs Car Restoration')
@@ -83,13 +83,13 @@ public class CODABasecampWizardController
 			}
 			// Select Project and Dimension to map to
 			else if (Step == 1)
-			{							
+			{
 				// Retrieve for selected Project the Todo Lists and People working on it
 				TodoLists = new List<SelectTodoList>();
  	 			for(CODABasecamp.ProjectEntry project : Projects)
  	 			{
  	 				// Selected project?
- 	 				if(project.ID == SelectedProjectID)				
+ 	 				if(project.ID == SelectedProjectID)
  	 				{
  	 					// Filter for Todo Lists on this project with time tracking enabled
 						SelectedProject = project;
@@ -98,17 +98,17 @@ public class CODABasecampWizardController
 								TodoLists.add(new SelectTodoList(todoList));
 		 	 			if( TodoLists.Size() == 0 )
 		 	 				throw new WizardException('The selected project must have at least one todo list that is time tracked.');
-						
+
 						// Retrieve a list of the People in the project (used later)
 						List<CODABasecamp.Person> people = SelectedProject.getPeople();
 						m_peopleMap.clear();
 						for(CODABasecamp.Person person : people)
 							m_peopleMap.put(person.Id, person);
-								
-						// Done				
-						break;					
+
+						// Done
+						break;
  	 				}
- 	 			} 
+ 	 			}
 			}
 			// Select Todo Lists and Dimension to map to
 			else if (Step == 2)
@@ -118,16 +118,16 @@ public class CODABasecampWizardController
 				for(SelectTodoList selectedTodoList : TodoLists)
 					if(selectedTodoList.Selected)
 						selectedTodoLists.add(SelectedProject.getTodoList(selectedTodoList.TodoList.Id));
-				
+
 				// Build a list of selected Todo Item's (later we can add filtering e.g. completed only)
 				Map<String, CODABasecamp.TodoList> selectedTodoItemIds = new Map<String, CODABasecamp.TodoList>();
 				for(CODABasecamp.TodoList todoList : selectedTodoLists)
 					for(CODABasecamp.TodoItem todoItem : todoList.TodoItems)
-						selectedTodoItemIds.put(todoItem.Id, todoList);									
-				
+						selectedTodoItemIds.put(todoItem.Id, todoList);
+
 				// Retrieve time entries for selected project
 				List<CODABasecamp.TimeEntry> timeEntries = SelectedProject.getTimeEntries();
-				
+
 				// Display only time entries for todo items from selected lists
 				TimeEntires = new List<SelectTimeEntry>();
 				for(CODABasecamp.TimeEntry timeEntry : timeEntries)
@@ -144,14 +144,14 @@ public class CODABasecampWizardController
 				for(SelectTimeEntry timeEntry : TimeEntires)
 					if(timeEntry.Selected)
 						ReviewInvoiceLineItems.add(new ReviewInvoiceLineItem(timeEntry.Person, timeEntry.TimeEntry, timeEntry.TodoList));
-				
+
 				// Prompt for Account and Products to post Invoice against
 				List<String> companies = c2g.CODAAPICompany_2_0.GetCurrentCompanies(null);
-				Lookup = new Lookup__c();
+				Lookup = new c2g__codaLookup__c();
 				try
 				{
 					// Attempt to default Account and Product fields for demo purposes
-					Date now = System.now().date();				
+					Date now = System.now().date();
 					Lookup.Account__c = [select id from Account where Name = 'Algernon Partners & Co'][0].Id;
 					Lookup.Product__c = [select id from Product2 where Name = 'Annual Service Contract'][0].Id;
 					Lookup.Currency__c = [select id from c2g__codaAccountingCurrency__c where Name = 'USD' and c2g__OwnerCompany__r.Name = :companies[0]][0].Id;
@@ -164,31 +164,31 @@ public class CODABasecampWizardController
 			}
 			// Create Invoice
 			else if (Step == 4)
-			{	
-				// Retrieve price book info for chosen product and currency			
+			{
+				// Retrieve price book info for chosen product and currency
 				string currencyIso = null;
 				double unitPrice = 0;
 				try
 				{
 					// Currency ISO
 					currencyIso =
-						[select Name from c2g__codaAccountingCurrency__c where Id = :Lookup.Currency__c][0].Name;				
-					// Unit Price 
-					unitPrice =  
-						[select UnitPrice, Product2Id, CurrencyIsoCode 
-						 from PricebookEntry 
+						[select Name from c2g__codaAccountingCurrency__c where Id = :Lookup.Currency__c][0].Name;
+					// Unit Price
+					unitPrice =
+						[select UnitPrice, Product2Id, CurrencyIsoCode
+						 from PricebookEntry
 						 where Product2Id = :Lookup.Product__c and CurrencyIsoCode = :currencyIso][0].UnitPrice;
 				}
 				catch (Exception e)
 				{
 					// For demo, not an issue if the price cannot be found, will defult to 0, then can be edited
 				}
-				
+
 				// Ordinal position (base 0) of project, todo list and person dimensions
 				Integer projectDimensionIdx = Integer.valueOf(SelectedDimensionProject) - 1;
 				Integer todoDimensionIdx = Integer.valueOf(SelectedDimensionTodoList) - 1;
 				Integer personDimensionIdx = Integer.valueOf(SelectedDimensionPerson) - 1;
-				
+
 				// Calculate distint dimension names
 				List<Map<String, DimensionInfo>> dimensions = new List<Map<String, DimensionInfo>>();
 				dimensions.add(new Map<String, DimensionInfo>());
@@ -212,61 +212,61 @@ public class CODABasecampWizardController
 					DimensionInfo person = new DimensionInfo();
 					person.Name = personName;
 					person.Id = personId;
-					dimensions[projectDimensionIdx].put(projectName, project); 
+					dimensions[projectDimensionIdx].put(projectName, project);
 					dimensions[todoDimensionIdx].put(todoListName, todoList);
 					dimensions[personDimensionIdx].put(personName, person);
 				}
-				
+
 				// Prepare required dimensions for upsert
 				List<c2g.CODAAPIDimension_3_0.Dimension> dimension1 = new List<c2g.CODAAPIDimension_3_0.Dimension>();
 				List<c2g.CODAAPIDimension_3_0.Dimension> dimension2 = new List<c2g.CODAAPIDimension_3_0.Dimension>();
 				List<c2g.CODAAPIDimension_3_0.Dimension> dimension3 = new List<c2g.CODAAPIDimension_3_0.Dimension>();
-				List<c2g.CODAAPIDimension_3_0.Dimension> dimension4 = new List<c2g.CODAAPIDimension_3_0.Dimension>();				 
+				List<c2g.CODAAPIDimension_3_0.Dimension> dimension4 = new List<c2g.CODAAPIDimension_3_0.Dimension>();
 				Integer dimensionIdx = 1;
 				for(Map<String, DimensionInfo> dimensionNames : dimensions)
-				{  
+				{
 					for(DimensionInfo dimensionInfo : dimensionNames.values())
 					{
 						String dimensionName = dimensionInfo.Name;
 						String dimensionId = dimensionInfo.Id;
 						if(dimensionIdx == 1)
-						{	
+						{
 							// Create a Dimension 1 record
 							c2g.CODAAPIDimension_3_0.Dimension dimension = new c2g.CODAAPIDimension_3_0.Dimension();
 							dimension.Name = dimensionName;
 							dimension.CurrencyIsoCode = currencyIso;
 							dimension.ReportingCode = dimensionId;
-							dimension.ExternalId = dimensionId; 
+							dimension.ExternalId = dimensionId;
 							dimension1.add(dimension);
 						}
 						else if(dimensionIdx == 2)
-						{ 
+						{
 							// Create a Dimension 2 record
 							c2g.CODAAPIDimension_3_0.Dimension dimension = new c2g.CODAAPIDimension_3_0.Dimension();
 							dimension.Name = dimensionName;
-							dimension.CurrencyIsoCode = currencyIso; 
-							dimension.ReportingCode = dimensionId; 
-							dimension.ExternalId = dimensionId; 
+							dimension.CurrencyIsoCode = currencyIso;
+							dimension.ReportingCode = dimensionId;
+							dimension.ExternalId = dimensionId;
 							dimension2.add(dimension);
 						}
 						else if(dimensionIdx == 3)
-						{ 
+						{
 							// Create a Dimension 3 record
 							c2g.CODAAPIDimension_3_0.Dimension dimension = new c2g.CODAAPIDimension_3_0.Dimension();
 							dimension.Name = dimensionName;
-							dimension.CurrencyIsoCode = currencyIso; 
-							dimension.ReportingCode = dimensionId; 
-							dimension.ExternalId = dimensionId; 
+							dimension.CurrencyIsoCode = currencyIso;
+							dimension.ReportingCode = dimensionId;
+							dimension.ExternalId = dimensionId;
 							dimension3.add(dimension);
 						}
 						else if(dimensionIdx == 4)
-						{ 
+						{
 							// Create a Dimension 4 record
 							c2g.CODAAPIDimension_3_0.Dimension dimension = new c2g.CODAAPIDimension_3_0.Dimension();
 							dimension.Name = dimensionName;
-							dimension.CurrencyIsoCode = currencyIso; 
-							dimension.ReportingCode = dimensionId; 
-							dimension.ExternalId = dimensionId; 
+							dimension.CurrencyIsoCode = currencyIso;
+							dimension.ReportingCode = dimensionId;
+							dimension.ExternalId = dimensionId;
 							dimension4.add(dimension);
 						}
 					}
@@ -276,7 +276,7 @@ public class CODABasecampWizardController
 				// IMPORTANT NOTE: Known issue with mixed scope API calls
 				// 	If calling none company scope API's, followed by company scope API's call this API first
 				List<String> companies = c2g.CODAAPICompany_2_0.GetCurrentCompanies(null);
-				
+
 				// Bypass during test mode (not enough test data setup to create invoice)
 				List<c2g.CODAAPICommon.Reference> dimension1Refs = new List<c2g.CODAAPICommon.Reference>();
 				List<c2g.CODAAPICommon.Reference> dimension2Refs = new List<c2g.CODAAPICommon.Reference>();
@@ -305,7 +305,7 @@ public class CODABasecampWizardController
 					dimensionsIds[2].put(dimension.Name, dimension.Id);
 				for(c2g.CODAAPICommon.Reference dimension : dimension4Refs)
 					dimensionsIds[3].put(dimension.Name, dimension.Id);
-				
+
 				// Create the Invoice
 				c2g.CODAAPIInvoiceTypes_3_0.Invoice invoice = new c2g.CODAAPIInvoiceTypes_3_0.Invoice();
 				invoice.Account = new c2g.CODAAPICommon.Reference();
@@ -327,7 +327,7 @@ public class CODABasecampWizardController
 				for(ReviewInvoiceLineItem reviewInvoiceLineItem : ReviewInvoiceLineItems)
 				{
 					// Create Invoice Line Item
-					c2g.CODAAPIInvoiceLineItemTypes_3_0.InvoiceLineItem invoiceLineItem = new c2g.CODAAPIInvoiceLineItemTypes_3_0.InvoiceLineItem(); 
+					c2g.CODAAPIInvoiceLineItemTypes_3_0.InvoiceLineItem invoiceLineItem = new c2g.CODAAPIInvoiceLineItemTypes_3_0.InvoiceLineItem();
 					// Resolve ID's for Dimensions
 					String projectName = SelectedProject.Name;
 					String todoListName = reviewInvoiceLineItem.TodoList.Name;
@@ -346,7 +346,7 @@ public class CODABasecampWizardController
 					}
 					if(dimensionIds[1]!=null)
 					{
-						invoiceLineItem.Dimension2 = new c2g.CODAAPICommon.Reference(); 
+						invoiceLineItem.Dimension2 = new c2g.CODAAPICommon.Reference();
 						invoiceLineItem.Dimension2.Id = dimensionIds[1];
 					}
 					if(dimensionIds[2]!=null)
@@ -359,29 +359,29 @@ public class CODABasecampWizardController
 						invoiceLineItem.Dimension4 = new c2g.CODAAPICommon.Reference();
 						invoiceLineItem.Dimension4.Id = dimensionIds[3];
 					}
-					invoiceLineItem.UnitPrice = unitPrice;															
+					invoiceLineItem.UnitPrice = unitPrice;
 					invoiceLineItem.Quantity = Double.valueOf(reviewInvoiceLineItem.TimeEntry.Hours);
-					invoiceLineItem.LineDescription = reviewInvoiceLineItem.TimeEntry.Description;					
-					invoiceLineItem.Scheduled = false; 
+					invoiceLineItem.LineDescription = reviewInvoiceLineItem.TimeEntry.Description;
+					invoiceLineItem.Scheduled = false;
 					// Add line
 					invoice.LineItems.LineItemList.add(invoiceLineItem);
 				}
-				
+
 				// Bypass during test mode (not enough test data setup to create invoice)
 				if(!CODABasecamp.isTestMode())
 				{
-					c2g.CODAAPICommon.Reference invoiceRef = c2g.CODAAPISalesInvoice_3_0.createInvoice(null, invoice); 			 				
+					c2g.CODAAPICommon.Reference invoiceRef = c2g.CODAAPISalesInvoice_3_0.createInvoice(null, invoice);
 					// Redirect to Edit Invoice page
 					String url = Page.c2g__codaInvoiceEdit.getUrl() + '?id=' + invoiceRef.Id;
 					PageReference pageRef = new PageReference(url);
 					pageRef.setRedirect(true);
 					return pageRef;
 				}
-				
-				return null;			
+
+				return null;
 			}
 			Step++;
-			
+
 			// Setup the available dimensions to map
 			setupDimensionList();
 		//}
@@ -391,25 +391,25 @@ public class CODABasecampWizardController
 		//}
 		return null;
 	}
-	
+
 	public PageReference Back()
 	{
 		Step--;
-			
+
 		// Setup the available dimensions to map
 		setupDimensionList();
-		
+
 		return null;
 	}
-		
+
 	public List<SelectOption> getProjectList()
 	{
  	 	List<SelectOption> options = new List<SelectOption>();
- 	 	for(CODABasecamp.ProjectEntry project : Projects) 	 	
+ 	 	for(CODABasecamp.ProjectEntry project : Projects)
    	 		options.add(new SelectOption(project.ID, project.Name));
-   	 	return options;		
+   	 	return options;
 	}
-				
+
 	private void setupDimensionList()
 	{
 		Map<String, String> mappedDimensions = new Map<String, String>();
@@ -429,62 +429,62 @@ public class CODABasecampWizardController
 		if(!mappedDimensions.ContainsKey('4'))
 			DimensionList.add(new SelectOption('4', 'Dimension 4'));
 	}
-	
+
 	public class SelectTodoList
 	{
-		public Boolean Selected { get; set; }			
+		public Boolean Selected { get; set; }
 		public CODABasecamp.TodoList TodoList { get; set; }
-		
+
 		public SelectTodoList(CODABasecamp.TodoList todoList)
 		{
 			this.Selected = true;
 			this.TodoList = todoList;
 		}
 	}
-	
+
 	public class SelectTimeEntry
 	{
 		public Boolean Selected { get; set; }
 		public CODABasecamp.Person Person { get; set; }
 		public CODABasecamp.TimeEntry TimeEntry { get; set; }
 		public CODABasecamp.TodoList TodoList { get; set; }
-		
+
 		public SelectTimeEntry(CODABasecamp.Person person, CODABasecamp.TimeEntry timeEntry, CODABasecamp.TodoList todoList)
 		{
 			this.Selected = true;
 			this.Person = person;
 			this.TimeEntry = timeEntry;
 			this.TodoList = todoList;
-		}		
+		}
 	}
-	
+
 	public class ReviewInvoiceLineItem
 	{
 		public CODABasecamp.Person Person { get; set; }
 		public CODABasecamp.TimeEntry TimeEntry { get; set; }
 		public CODABasecamp.TodoList TodoList { get; set; }
-		
+
 		public ReviewInvoiceLineItem(CODABasecamp.Person person, CODABasecamp.TimeEntry timeEntry, CODABasecamp.TodoList todoList)
 		{
 			this.Person = person;
 			this.TimeEntry = timeEntry;
 			this.TodoList = todoList;
-		}		
+		}
 	}
-	
+
 	public class WizardException extends Exception
 	{
 	}
-	
+
 	public class DimensionInfo
 	{
 		public String Name;
-		public String Id;	
+		public String Id;
 	}
-	
+
 	public class StopException extends Exception
 	{
-		
+
 	}
-		
+
 }
