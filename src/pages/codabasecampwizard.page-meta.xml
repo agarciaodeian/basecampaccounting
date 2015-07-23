@@ -2,9 +2,4 @@
 <ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>16.0</apiVersion>
     <label>codabasecampwizard</label>
-    <packageVersions>
-        <majorNumber>3</majorNumber>
-        <minorNumber>0</minorNumber>
-        <namespace>c2g</namespace>
-    </packageVersions>
 </ApexPage>
