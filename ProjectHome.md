@@ -1,0 +1,3 @@
+Wizard based integration running on the Force.com platform. Between the Basecamp project management solution (http://basecamphq.com) and FinancialForce.com's Force.com Accounting soluton, http://www.financialforce.com. Can be used to raise Invoices for work recorded in Basecamp. Contains an Apex based wrapper fo the Basecamp API. For more information see http://developer.financialforce.com.
+
+Check out the demo video http://www.youtube.com/watch?v=KMPbZXWQ0oo
