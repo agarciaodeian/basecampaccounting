@@ -152,10 +152,10 @@ public class CODABasecampWizardController
 				{
 					// Attempt to default Account and Product fields for demo purposes
 					Date now = System.now().date();
-					Lookup.Account__c = [select id from Account where Name = 'Algernon Partners & Co'][0].Id;
-					Lookup.Product__c = [select id from Product2 where Name = 'Annual Service Contract'][0].Id;
-					Lookup.Currency__c = [select id from c2g__codaAccountingCurrency__c where Name = 'USD' and c2g__OwnerCompany__r.Name = :companies[0]][0].Id;
-					Lookup.Period__c = [select id from c2g__codaPeriod__c where Name = '2010/001'][0].Id;
+					Lookup.c2g__Account__c = [select id from Account where Name = 'Algernon Partners & Co'][0].Id;
+					Lookup.c2g__Product__c = [select id from Product2 where Name = 'Annual Service Contract'][0].Id;
+					Lookup.c2g__AccountingCurrency__c = [select id from c2g__codaAccountingCurrency__c where Name = 'USD' and c2g__OwnerCompany__r.Name = :companies[0]][0].Id;
+					Lookup.c2g__Period__c = [select id from c2g__codaPeriod__c where Name = '2010/001'][0].Id;
 				}
 				catch (Exception e)
 				{
@@ -172,12 +172,12 @@ public class CODABasecampWizardController
 				{
 					// Currency ISO
 					currencyIso =
-						[select Name from c2g__codaAccountingCurrency__c where Id = :Lookup.Currency__c][0].Name;
+						[select Name from c2g__codaAccountingCurrency__c where Id = :Lookup.c2g__AccountingCurrency__c][0].Name;
 					// Unit Price
 					unitPrice =
 						[select UnitPrice, Product2Id, CurrencyIsoCode
 						 from PricebookEntry
-						 where Product2Id = :Lookup.Product__c and CurrencyIsoCode = :currencyIso][0].UnitPrice;
+						 where Product2Id = :Lookup.c2g__Product__c and CurrencyIsoCode = :currencyIso][0].UnitPrice;
 				}
 				catch (Exception e)
 				{
@@ -309,16 +309,16 @@ public class CODABasecampWizardController
 				// Create the Invoice
 				c2g.CODAAPIInvoiceTypes_3_0.Invoice invoice = new c2g.CODAAPIInvoiceTypes_3_0.Invoice();
 				invoice.Account = new c2g.CODAAPICommon.Reference();
-				invoice.Account.Id = Lookup.Account__c;
+				invoice.Account.Id = Lookup.c2g__Account__c;
 				invoice.InvoiceCurrency = new c2g.CODAAPICommon.Reference();
-				invoice.InvoiceCurrency.Id = Lookup.Currency__c;
+				invoice.InvoiceCurrency.Id = Lookup.c2g__AccountingCurrency__c;
 				invoice.LineItems = new c2g.CODAAPIInvoiceLineItemTypes_3_0.InvoiceLineItems();
 				invoice.LineItems.LineItemList = new List<c2g.CODAAPIInvoiceLineItemTypes_3_0.InvoiceLineItem>();
 				invoice.InvoiceStatus = c2g.CODAAPIInvoiceTypes_3_0.enumInvoiceStatus.InProgress;
 				invoice.DueDate = System.now().addMonths(6).date();
 				invoice.InvoiceDate = System.now().date();
 				invoice.Period = new c2g.CODAAPICommon.Reference();
-				invoice.Period.Id = Lookup.Period__c;
+				invoice.Period.Id = Lookup.c2g__Period__c;
 				invoice.PrintedText1AllowEdit = false;
 				invoice.PrintedText2AllowEdit = false;
 				invoice.PrintedText3AllowEdit = false;
@@ -338,7 +338,7 @@ public class CODABasecampWizardController
 					dimensionIds[personDimensionIdx] = dimensionsIds[personDimensionIdx].get(personName);
 					// Setup Invoice Line Item
 					invoiceLineItem.Product = new c2g.CODAAPICommon.Reference();
-					invoiceLineItem.Product.Id = Lookup.Product__c;
+					invoiceLineItem.Product.Id = Lookup.c2g__Product__c;
 					if(dimensionIds[0]!=null)
 					{
 						invoiceLineItem.Dimension1 = new c2g.CODAAPICommon.Reference();
